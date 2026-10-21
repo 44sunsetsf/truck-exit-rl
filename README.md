@@ -63,7 +63,9 @@ What this shows so far:
 
 **GRPO, a first look.** `grpo/grpo_exit.py` post-trains Qwen2.5-0.5B-Instruct with GRPO (TRL) to pick one action
 (KEEP / RIGHT / LEFT / SLOW) from a text description of an exit-ramp scene, with a rule-based heavy-truck reward.
-After 30 steps (8 generations per prompt) agreement with the rule on 200 held-out scenes stayed at 27%: no gain yet.
-Longer runs are next.
+After 30 steps (8 generations per prompt) agreement with the rule on 200 held-out scenes stayed at 27%. The logs
+showed why: in 80–100% of groups all 8 answers were identical, so the group-relative advantage was zero and there was
+nothing to learn from. Raising the sampling temperature to 1.5 fixed that (groups with zero reward spread fell to
+0–5%), but 15 steps were not enough to help: agreement went from 27% to 24%, within noise. Longer runs are next.
 
 These are single-seed, short runs; treat them as a first look, not a benchmark.

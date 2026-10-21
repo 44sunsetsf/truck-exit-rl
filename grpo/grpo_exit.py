@@ -113,8 +113,8 @@ def main():
     before = accuracy(base, tok, test)
     print('before', before, flush=True)
 
-    cfg = GRPOConfig(output_dir='grpo/out', max_steps=args.steps, per_device_train_batch_size=8,
-                     num_generations=8, max_completion_length=8, learning_rate=1e-5, beta=0.0,
+    cfg = GRPOConfig(output_dir='grpo/out', max_steps=args.steps, per_device_train_batch_size=16,
+                     num_generations=8, max_completion_length=8, learning_rate=1e-5, beta=0.0, temperature=1.5,
                      logging_steps=10, save_strategy='no', report_to=[], seed=0)
     trainer = GRPOTrainer(model=base, reward_funcs=reward_fn, args=cfg, train_dataset=train, processing_class=tok)
     trainer.train()
@@ -122,7 +122,7 @@ def main():
     print('after', after, flush=True)
 
     Path('results').mkdir(exist_ok=True)
-    Path('results/grpo_exit.json').write_text(json.dumps(
+    Path(f'results/grpo_exit_{args.steps}steps_t15.json').write_text(json.dumps(
         {'model': MODEL, 'steps': args.steps, 'test_scenes': args.test, 'before': before, 'after': after}, indent=2))
 
 
