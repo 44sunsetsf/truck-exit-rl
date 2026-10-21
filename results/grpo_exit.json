@@ -1,0 +1,13 @@
+{
+  "model": "Qwen/Qwen2.5-0.5B-Instruct",
+  "steps": 30,
+  "test_scenes": 200,
+  "before": {
+    "accuracy": 0.27,
+    "valid_answers": 1.0
+  },
+  "after": {
+    "accuracy": 0.27,
+    "valid_answers": 1.0
+  }
+}
