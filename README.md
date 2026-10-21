@@ -46,6 +46,8 @@ Next: more seeds, an ablation of each reward term, and PPO for comparison.
 | truck, default reward | truck | default | 12% | 85% | 1.9 s | 3.1 |
 | truck, shaped v1 | truck | shaped (crash −1, gap weight 0.1) | 8% | 92% | 0.5 s | 2.9 |
 | truck, shaped v2 | truck | shaped (crash −5, gap weight 0.3) | 19% | 77% | 1.0 s | 3.8 |
+| PPO, default reward | truck | default | 0% | 4% | 6.9 s | 1.8 |
+| PPO, shaped v2 | truck | shaped v2 | 0% | 0% | 10 s (no car ahead) | 0.0 |
 
 What this shows so far:
 - `exit-v0`'s default reward has **no collision cost** (`collision_reward: 0`), so a crash simply ends the episode.
@@ -54,5 +56,9 @@ What this shows so far:
 - The first shaped reward was too weak to change that within 50k steps. My guess is that the per-step exit-side bonus outweighs
   the gap and crash terms. A second version with a crash penalty of −5 and a gap weight of 0.3 helped: exit success 12% → 19%, crashes
   85% → 77%. Still far from safe; next are more training steps, more seeds and an ablation of each reward term.
+
+- **PPO** (same 50k steps, n_steps 512, gamma 0.8) went the other way: with either reward it settled on a passive
+  policy that stays in its lane and almost never crashes, but never reaches the exit. Safe but useless; the exit bonus
+  is too sparse for PPO to find within this budget.
 
 These are single-seed, short runs; treat them as a first look, not a benchmark.

@@ -1,0 +1,11 @@
+{
+  "name": "truck_truck2_s0_ppo",
+  "steps": 50000,
+  "eval_on_truck": {
+    "episodes": 100,
+    "exit_rate": 0.0,
+    "crash_rate": 0.0,
+    "mean_min_time_gap_s": 10.0,
+    "mean_lane_changes": 0.0
+  }
+}

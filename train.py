@@ -16,7 +16,7 @@ from pathlib import Path
 import gymnasium as gym
 import highway_env  # noqa: F401  registers the environments
 import numpy as np
-from stable_baselines3 import DQN
+from stable_baselines3 import DQN, PPO
 
 TRUCK_LENGTH = 16.5
 
@@ -107,14 +107,19 @@ def main():
     parser.add_argument('--steps', type=int, default=50_000)
     parser.add_argument('--seed', type=int, default=0)
     parser.add_argument('--episodes', type=int, default=100)
+    parser.add_argument('--algo', choices=['dqn', 'ppo'], default='dqn')
     args = parser.parse_args()
 
-    name = f'{args.vehicle}_{args.reward}_s{args.seed}'
+    name = f'{args.vehicle}_{args.reward}_s{args.seed}' + ('' if args.algo == 'dqn' else f'_{args.algo}')
     env = make_env(args.vehicle, args.reward)
-    model = DQN('MlpPolicy', env, policy_kwargs=dict(net_arch=[256, 256]), learning_rate=5e-4,
-                buffer_size=15_000, learning_starts=200, batch_size=32, gamma=0.8, train_freq=1,
-                gradient_steps=1, target_update_interval=50, exploration_fraction=0.7,
-                seed=args.seed, verbose=0)
+    if args.algo == 'ppo':
+        model = PPO('MlpPolicy', env, policy_kwargs=dict(net_arch=[256, 256]), learning_rate=5e-4, n_steps=512,
+                    batch_size=64, gamma=0.8, seed=args.seed, verbose=0)
+    else:
+        model = DQN('MlpPolicy', env, policy_kwargs=dict(net_arch=[256, 256]), learning_rate=5e-4,
+                    buffer_size=15_000, learning_starts=200, batch_size=32, gamma=0.8, train_freq=1,
+                    gradient_steps=1, target_update_interval=50, exploration_fraction=0.7,
+                    seed=args.seed, verbose=0)
     model.learn(total_timesteps=args.steps)
     Path('models').mkdir(exist_ok=True)
     model.save(f'models/{name}')

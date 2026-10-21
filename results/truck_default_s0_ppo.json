@@ -1,0 +1,11 @@
+{
+  "name": "truck_default_s0_ppo",
+  "steps": 50000,
+  "eval_on_truck": {
+    "episodes": 100,
+    "exit_rate": 0.0,
+    "crash_rate": 0.04,
+    "mean_min_time_gap_s": 6.878883251497672,
+    "mean_lane_changes": 1.8
+  }
+}
