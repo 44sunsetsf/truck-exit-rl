@@ -50,7 +50,7 @@ What this shows so far:
 - `exit-v0`'s default reward has **no collision cost** (`collision_reward: 0`), so a crash simply ends the episode.
   The policy trained on it as the truck goes for the exit aggressively and crashes in 85% of episodes.
 - The car-trained policy is passive rather than safe: it crashes less but almost never reaches the exit.
-- The first shaped reward was too weak to change that within 50k steps: the small per-step exit-side bonus outweighs
+- The first shaped reward was too weak to change that within 50k steps. My guess is that the per-step exit-side bonus outweighs
   the gap and crash terms. A second version with a crash penalty of −5 and a gap weight of 0.3 is training now.
 
 These are single-seed, short runs; treat them as a first look, not a benchmark.
