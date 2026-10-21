@@ -24,9 +24,10 @@ TRUCK_LENGTH = 16.5
 class TruckWrapper(gym.Wrapper):
     """Turns the ego car into a long, slower truck and optionally reshapes the reward."""
 
-    def __init__(self, env, truck: bool, shaped: bool):
+    def __init__(self, env, truck: bool, shaped: bool, crash_penalty: float = 1.0, gap_weight: float = 0.1):
         super().__init__(env)
         self.truck, self.shaped = truck, shaped
+        self.crash_penalty, self.gap_weight = crash_penalty, gap_weight
 
     def reset(self, **kwargs):
         obs, info = self.env.reset(**kwargs)
@@ -51,11 +52,11 @@ class TruckWrapper(gym.Wrapper):
             reward += 0.05 * (lane[2] / max(road_lanes - 1, 1))
             # heavy vehicles need a larger time gap to the vehicle in front
             if gap < 2.5:
-                reward -= 0.1 * (2.5 - gap) / 2.5
+                reward -= self.gap_weight * (2.5 - gap) / 2.5
             # comfort: discourage lane changes that are not needed
             reward -= 0.02 * int(changed)
             if ego.crashed:
-                reward -= 1.0
+                reward -= self.crash_penalty
         return obs, reward, terminated, truncated, info
 
 
@@ -72,6 +73,9 @@ def make_env(vehicle: str, reward: str):
     env = gym.make('exit-v0')
     if vehicle == 'truck':
         env.unwrapped.configure({'action': {'type': 'DiscreteMetaAction', 'target_speeds': [14, 19, 24]}})
+    # truck2: second shaping attempt with a much stronger crash penalty and gap weight
+    if reward == 'truck2':
+        return TruckWrapper(env, truck=vehicle == 'truck', shaped=True, crash_penalty=5.0, gap_weight=0.3)
     return TruckWrapper(env, truck=vehicle == 'truck', shaped=reward == 'truck')
 
 
@@ -99,7 +103,7 @@ def evaluate(model, vehicle: str, episodes: int, seed: int) -> dict:
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--vehicle', choices=['car', 'truck'], default='car')
-    parser.add_argument('--reward', choices=['default', 'truck'], default='default')
+    parser.add_argument('--reward', choices=['default', 'truck', 'truck2'], default='default')
     parser.add_argument('--steps', type=int, default=50_000)
     parser.add_argument('--seed', type=int, default=0)
     parser.add_argument('--episodes', type=int, default=100)
